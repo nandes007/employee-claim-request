@@ -43,6 +43,10 @@ func (c ClaimRequestServiceImpl) Create(ctx context.Context, r claim_request.Req
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
 	}
+	if user.CompanyId == 0 {
+		err = errors.New("sorry, you don't have company")
+		panic(exception.NewBadRequestError(err.Error()))
+	}
 
 	if user.IsAdmin {
 		err = errors.New("sorry, you don't have access to this feature")
@@ -83,6 +87,10 @@ func (c ClaimRequestServiceImpl) Update(ctx context.Context, r claim_request.Req
 	user, err := c.UserRepository.Find(ctx, c.DB, tokenFormatted)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
+	}
+	if user.CompanyId == 0 {
+		err = errors.New("sorry, you don't have company")
+		panic(exception.NewBadRequestError(err.Error()))
 	}
 
 	if user.IsAdmin {
@@ -159,6 +167,10 @@ func (c ClaimRequestServiceImpl) Delete(ctx context.Context, id int, token strin
 	user, err := c.UserRepository.Find(ctx, c.DB, tokenFormatted)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
+	}
+	if user.CompanyId == 0 {
+		err = errors.New("sorry, you don't have company")
+		panic(exception.NewBadRequestError(err.Error()))
 	}
 
 	if user.IsAdmin {

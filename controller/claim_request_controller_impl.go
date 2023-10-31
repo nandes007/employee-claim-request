@@ -2,10 +2,7 @@ package controller
 
 import (
 	"errors"
-	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
@@ -129,67 +126,4 @@ func (c ClaimRequestControllerImpl) GetAll(w http.ResponseWriter, r *http.Reques
 	}
 
 	helper.WriteToResponseBody(w, apiResponse)
-}
-
-func (c ClaimRequestControllerImpl) UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// Parse the multipart form data
-	err := r.ParseMultipartForm(10 << 20) // 10 MB limit
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		fmt.Println("ERROR1")
-		return
-	}
-
-	// Retrieve the file from the request
-	file, handler, err := r.FormFile("file")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		fmt.Println("ERROR2")
-		return
-	}
-	defer file.Close()
-
-	// Specify the directory where you want to save the uploaded files
-	uploadDir := "uploads/"
-
-	// Create the directory if it doesn't exist
-	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
-		err := os.MkdirAll(uploadDir, os.ModePerm)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	// Create a new file on the server and copy the uploaded file to it
-	newFile, err := os.Create("uploads/" + handler.Filename)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		fmt.Println("ERROR3")
-		return
-	}
-	defer newFile.Close()
-
-	_, err = io.Copy(newFile, file)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		fmt.Println("ERROR4")
-		return
-	}
-
-	// Get the server address from the request
-	serverAddr := fmt.Sprintf("%s://%s", getProto(r), r.Host)
-
-	// Construct the URL for the uploaded file
-	fileURL := fmt.Sprintf("%s/uploads/%s", serverAddr, handler.Filename)
-
-	// Return the URL as a response
-	fmt.Fprintf(w, "File uploaded successfully. You can access it at: <a href='%s'>%s</a>", fileURL, fileURL)
-}
-
-func getProto(r *http.Request) string {
-	if r.TLS != nil {
-		return "https"
-	}
-	return "http"
 }

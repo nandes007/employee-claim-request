@@ -13,5 +13,4 @@ type ClaimRequestController interface {
 	Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	Find(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	GetAll(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
-	UploadFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 }

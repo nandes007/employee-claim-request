@@ -36,7 +36,6 @@ func NewRouter(authController controller.AuthController, companyController contr
 	router.PUT("/api/claim-requests/:id", middleware.JwtAuthMiddleware(claimRequestController.Update))
 	router.PUT("/api/claim-requests/:id/status", middleware.JwtAuthMiddleware(claimRequestController.UpdateStatus))
 	router.DELETE("/api/claim-requests/:id", middleware.JwtAuthMiddleware(claimRequestController.Delete))
-	router.POST("/api/upload", middleware.JwtAuthMiddleware(claimRequestController.UploadFile))
 
 	router.PanicHandler = exception.ErrorHandler
 
